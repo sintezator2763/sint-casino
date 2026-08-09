@@ -5,92 +5,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SINT-CASINO.COM — Главная</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial Black', 'Impact', sans-serif; }
-        body { background: #080012; color: #fff; text-align: center; padding: 10px; overflow-x: hidden; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial Black', 'Impact', sans-serif;
+        }
+
+        body {
+            background: #080012;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
         .casino-card {
-            width: 100%; max-width: 650px; margin: 0 auto;
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
             background: radial-gradient(circle, #1a002c 0%, #05000a 100%);
-            border: 4px solid #ff007f; border-radius: 20px; padding: 15px;
-            box-shadow: 0 0 25px #ff007f; position: relative;
+            border: 4px solid #ff007f;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 0 25px #ff007f;
+            position: relative;
         }
-        .btn-settings {
-            position: absolute; top: 15px; right: 15px;
-            background: #1f0036; border: 2px solid #00ffff; color: #00ffff;
-            border-radius: 50%; width: 38px; height: 38px; font-size: 1.1rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: transform 0.15s, background 0.15s;
+
+        h1 {
+            font-size: 2rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff0055;
+            margin-bottom: 2px;
         }
-        .btn-settings:hover { transform: scale(1.1); background: #00ffff; color: #000; }
-        h1 { font-size: 2rem; color: #ffcc00; text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff0055; margin-bottom: 2px; }
-        .subtitle { color: #00ffff; font-size: 0.9rem; margin-bottom: 15px; text-shadow: 0 0 5px #00ffff; }
+
+        .subtitle {
+            color: #00ffff;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
         .balance-bar {
             background: linear-gradient(90deg, #1f0036, #3a0066);
-            border: 2px solid #00ff66; border-radius: 12px; padding: 10px 15px;
-            font-size: 1.2rem; color: #00ff66; margin-bottom: 15px;
+            border: 2px solid #00ff66;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            color: #00ff66;
+            margin-bottom: 15px;
             box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
         }
+
         .balance-actions { display: flex; gap: 8px; }
+
         .balance-bar span.btn-action {
-            padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
-            font-weight: bold; transition: transform 0.1s;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
         }
+
         .balance-bar span.btn-action:hover { transform: scale(1.05); }
         .balance-bar span.plus { background: #00ff66; color: #000; }
         .balance-bar span.minus { background: #ff3366; color: #fff; }
 
-        .stats-title { color: #00ffff; font-size: 1rem; margin: 15px 0 10px; text-shadow: 0 0 5px #00ffff; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-        .stat-box { background: #000; border: 2px solid #ff007f; border-radius: 12px; padding: 10px; }
-        .stat-box .value { font-size: 1.3rem; font-weight: 900; color: #ffcc00; text-shadow: 0 0 8px #ffcc00; }
+        .stats-title {
+            color: #00ffff;
+            font-size: 1rem;
+            margin: 15px 0 10px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: #000;
+            border: 2px solid #ff007f;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .stat-box .value {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #ffcc00;
+            text-shadow: 0 0 8px #ffcc00;
+        }
+
         .stat-box.profit .value.pos { color: #00ff66; text-shadow: 0 0 8px #00ff66; }
         .stat-box.profit .value.neg { color: #ff3366; text-shadow: 0 0 8px #ff3366; }
-        .stat-box .label { font-size: 0.7rem; color: #aaa; margin-top: 3px; }
 
-        .breakdown-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
-        .breakdown-chip { background: #1f0036; border: 2px solid #00ffff; color: #00ffff; border-radius: 20px; padding: 6px 12px; font-size: 0.75rem; font-weight: bold; }
-
-        .games-grid { display: flex; flex-direction: column; gap: 12px; }
-        .game-card {
-            display: flex; align-items: center; gap: 15px; background: #000;
-            border: 3px solid #ffcc00; border-radius: 15px; padding: 14px 18px;
-            text-decoration: none; color: #fff; text-align: left; transition: transform 0.15s, box-shadow 0.15s;
+        .stat-box .label {
+            font-size: 0.7rem;
+            color: #aaa;
+            margin-top: 3px;
         }
-        .game-card:hover { transform: scale(1.02); box-shadow: 0 0 18px #ffcc00; }
-        .game-card .icon { font-size: 2.5rem; flex-shrink: 0; }
-        .game-card .info h3 { font-size: 1.2rem; color: #ffcc00; margin-bottom: 3px; }
-        .game-card .info p { font-size: 0.8rem; color: #aaa; font-weight: normal; }
+
+        .breakdown-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .breakdown-chip {
+            background: #1f0036;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .games-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .game-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #000;
+            border: 3px solid #ffcc00;
+            border-radius: 15px;
+            padding: 14px 18px;
+            text-decoration: none;
+            color: #fff;
+            text-align: left;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .game-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 18px #ffcc00;
+        }
+
+        .game-card .icon {
+            font-size: 2.5rem;
+            flex-shrink: 0;
+        }
+
+        .game-card .info h3 {
+            font-size: 1.2rem;
+            color: #ffcc00;
+            margin-bottom: 3px;
+        }
+
+        .game-card .info p {
+            font-size: 0.8rem;
+            color: #aaa;
+            font-weight: normal;
+        }
 
         .modal {
-            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.93); border-radius: 20px; z-index: 100;
-            flex-direction: column; justify-content: center; align-items: center; padding: 15px;
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.93);
+            border-radius: 20px;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
         }
+
         .modal.active { display: flex; }
-        .modal-content { background: #140024; border: 2px solid #00ffff; border-radius: 15px; padding: 15px; width: 90%; max-width: 400px; text-align: left; }
-        .modal-content h3 { color: #00ffff; text-align: center; margin-bottom: 10px; font-size: 1.2rem; }
+
+        .modal-content {
+            background: #140024;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
         .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-size: 0.75rem; color: #ccc; margin-bottom: 3px; }
-        .form-group input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ff007f; background: #000; color: #fff; font-size: 0.9rem; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #ccc;
+            margin-bottom: 3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ff007f;
+            background: #000;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
         .form-row { display: flex; gap: 10px; }
-        .error-msg { color: #ff3366; font-size: 0.8rem; margin-bottom: 10px; text-align: center; line-height: 1.3; }
-        .modal-btn { width: 100%; background: #00ff66; color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 5px; }
+
+        .error-msg {
+            color: #ff3366;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .modal-btn {
+            width: 100%;
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
         .modal-btn.withdraw-btn { background: #ff3366; color: #fff; }
         .close-btn { background: #444; color: #fff; margin-top: 5px; }
-        .egg-gif { width: 90px; height: auto; cursor: pointer; border-radius: 8px; transition: transform 0.2s; display: block; margin: 10px auto; }
-        .egg-gif:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
     <div class="casino-card">
-        <button class="btn-settings" onclick="openSettingsModal()" title="Настройки">⚙️</button>
-
         <h1>🎲 SINT-CASINO.COM 🎲</h1>
         <div class="subtitle">ГЛАВНАЯ СТРАНИЦА</div>
 
         <div class="balance-bar">
-            <div>💰 БАЛАНС: <span id="balanceVal">0 ₽</span></div>
+            <div>💰 БАЛАНС: <span id="balanceVal">0</span> ₽</div>
             <div class="balance-actions">
                 <span class="btn-action plus" onclick="openDepositModal()">+ ПОПОЛНИТЬ</span>
                 <span class="btn-action minus" onclick="openWithdrawModal()">- ВЫВЕСТИ</span>
@@ -147,22 +316,6 @@
             </a>
         </div>
 
-        <!-- Настройки Modal -->
-        <div class="modal" id="settingsModal">
-            <div class="modal-content" style="border-color: #ff007f;">
-                <h3 style="color: #ff007f;">⚙️ НАСТРОЙКИ</h3>
-                
-                <div style="text-align: center; margin: 10px 0;">
-                    <p style="font-size: 0.75rem; color: #aaa;">Секретное дерево:</p>
-                    <img src="https://media.tenor.com/Sj6JT-GpHE0AAAAj/the-man-behind-the-tree-deltarune.gif" alt="Egg Easter Egg" class="egg-gif" onclick="triggerEgg()" title="??">
-                </div>
-
-                <button class="modal-btn" style="background: #ff3366; color: #fff; margin-top: 10px;" onclick="deleteAccount()">🗑️ УДАЛИТЬ АККАУНТ</button>
-                <button class="modal-btn close-btn" onclick="closeSettingsModal()">ЗАКРЫТЬ</button>
-            </div>
-        </div>
-
-        <!-- Deposit Modal -->
         <div class="modal" id="depositModal">
             <div class="modal-content">
                 <h3>💳 ПОПОЛНЕНИЕ БАЛАНСА</h3>
@@ -190,7 +343,6 @@
             </div>
         </div>
 
-        <!-- Withdraw Modal -->
         <div class="modal" id="withdrawModal">
             <div class="modal-content" style="border-color: #ff3366;">
                 <h3 style="color: #ff3366;">💸 ВЫВОД СРЕДСТВ</h3>
@@ -221,7 +373,6 @@
 
     <script>
         const SINT_BALANCE_KEY = 'sint_casino_balance';
-        const SINT_STATS_KEY = 'sint_casino_stats';
         const SINT_DEFAULT_BALANCE = 0;
 
         function sintGetBalance() {
@@ -241,52 +392,32 @@
             return rounded;
         }
 
-        function sintAddBalance(delta) { return sintSetBalance(sintGetBalance() + delta); }
+        function sintAddBalance(delta) {
+            return sintSetBalance(sintGetBalance() + delta);
+        }
 
         function sintRenderBalance() {
-            const isEgg = sessionStorage.getItem('sint_egg_active') === 'true';
-            const eggSuffix = isEgg ? ', 🥚' : '';
             document.querySelectorAll('#balanceVal').forEach(el => {
-                el.innerText = sintGetBalance().toLocaleString() + ' ₽' + eggSuffix;
+                el.innerText = sintGetBalance().toLocaleString();
             });
         }
 
-        // --- Пасхалка c музыкой egg.mp3 ---
-        function initEggAudio() {
-            if (sessionStorage.getItem('sint_egg_active') === 'true') {
-                let audio = document.getElementById('sintEggAudio');
-                if (!audio) {
-                    audio = document.createElement('audio');
-                    audio.id = 'sintEggAudio';
-                    audio.src = 'egg.mp3';
-                    audio.loop = true;
-                    document.body.appendChild(audio);
-                }
-                const savedTime = parseFloat(sessionStorage.getItem('sint_egg_time') || '0');
-                if (!isNaN(savedTime) && savedTime > 0) audio.currentTime = savedTime;
-                
-                audio.play().catch(() => {
-                    const playOnClick = () => { audio.play(); window.removeEventListener('click', playOnClick); };
-                    window.addEventListener('click', playOnClick);
-                });
+        window.addEventListener('storage', (e) => {
+            if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
+            if (e.key === SINT_STATS_KEY) renderStats();
+        });
 
-                window.addEventListener('beforeunload', () => {
-                    if (audio && !audio.paused) sessionStorage.setItem('sint_egg_time', String(audio.currentTime));
-                });
-            }
-        }
-
-        function triggerEgg() {
-            sessionStorage.setItem('sint_egg_active', 'true');
-            initEggAudio();
-            sintRenderBalance();
-        }
+        const SINT_STATS_KEY = 'sint_casino_stats';
 
         function sintGetStats() {
             const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
             const raw = localStorage.getItem(SINT_STATS_KEY);
             if (!raw) return defaults;
-            try { return Object.assign({}, defaults, JSON.parse(raw)); } catch (e) { return defaults; }
+            try {
+                return Object.assign({}, defaults, JSON.parse(raw));
+            } catch (e) {
+                return defaults;
+            }
         }
 
         function renderStats() {
@@ -309,34 +440,18 @@
             `;
         }
 
-        function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
-        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
-
-        function deleteAccount() {
-            if (confirm('Вы уверены, что хотите удалить аккаунт? Весь баланс, статистика и прогресс будут безвозвратно уничтожены!')) {
-                localStorage.removeItem(SINT_BALANCE_KEY);
-                localStorage.removeItem(SINT_STATS_KEY);
-                sessionStorage.removeItem('sint_egg_active');
-                sessionStorage.removeItem('sint_egg_time');
-
-                const audio = document.getElementById('sintEggAudio');
-                if (audio) { audio.pause(); audio.remove(); }
-
-                sintSetBalance(SINT_DEFAULT_BALANCE);
-                localStorage.setItem(SINT_STATS_KEY, JSON.stringify({ spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 }));
-
-                renderStats();
-                sintRenderBalance();
-                closeSettingsModal();
-                alert('Аккаунт и весь прогресс успешно уничтожены!');
-            }
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('active');
+            document.getElementById('depositError').innerText = '';
         }
 
-        function openDepositModal() { document.getElementById('depositModal').classList.add('active'); document.getElementById('depositError').innerText = ''; }
-        function closeDepositModal() { document.getElementById('depositModal').classList.remove('active'); }
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('active');
+        }
 
         document.getElementById('cardNumber').addEventListener('input', function(e) {
-            let val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+            let val = e.target.value.replace(/\D/g, '');
+            val = val.replace(/(.{4})/g, '$1 ').trim();
             e.target.value = val.substring(0, 19);
         });
 
@@ -353,21 +468,45 @@
             const amount = parseInt(document.getElementById('depositAmount').value);
             const errorEl = document.getElementById('depositError');
 
-            if (!/^\d{16}$/.test(cardNum)) { errorEl.innerText = '❌ Неверный номер карты!'; return; }
-            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) { errorEl.innerText = '❌ Неверный срок действия!'; return; }
-            if (!/^\d{3}$/.test(cardCvc)) { errorEl.innerText = '❌ Неверный CVC код!'; return; }
-            if (isNaN(amount) || amount < 100 || amount > 10000) { errorEl.innerText = '❌ Сумма от 100 до 10 000 ₽!'; return; }
+            if (!/^\d{16}$/.test(cardNum)) {
+                errorEl.innerText = '❌ Неверный номер карты! Должно быть 16 цифр.';
+                return;
+            }
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
+                errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 05/28).';
+                return;
+            }
+            if (!/^\d{3}$/.test(cardCvc)) {
+                errorEl.innerText = '❌ Неверный CVC код! Должно быть 3 цифры.';
+                return;
+            }
+            if (isNaN(amount) || amount < 100 || amount > 10000) {
+                errorEl.innerText = '❌ Сумма пополнения должна быть от 100 до 10 000 ₽!';
+                return;
+            }
 
             sintAddBalance(amount);
             closeDepositModal();
             alert(`Успешно! Баланс пополнен на ${amount.toLocaleString()} ₽`);
+
+            document.getElementById('cardNumber').value = '';
+            document.getElementById('cardExp').value = '';
+            document.getElementById('cardCvc').value = '';
+            document.getElementById('depositAmount').value = '';
         }
 
-        function openWithdrawModal() { document.getElementById('withdrawModal').classList.add('active'); document.getElementById('withdrawError').innerText = ''; }
-        function closeWithdrawModal() { document.getElementById('withdrawModal').classList.remove('active'); }
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('active');
+            document.getElementById('withdrawError').innerText = '';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('active');
+        }
 
         document.getElementById('withdrawCardNumber').addEventListener('input', function(e) {
-            let val = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
+            let val = e.target.value.replace(/\D/g, '');
+            val = val.replace(/(.{4})/g, '$1 ').trim();
             e.target.value = val.substring(0, 19);
         });
 
@@ -384,22 +523,31 @@
             const amount = parseInt(document.getElementById('withdrawAmount').value);
             const errorEl = document.getElementById('withdrawError');
 
-            if (!/^\d{16}$/.test(cardNum)) { errorEl.innerText = '❌ Неверный номер карты!'; return; }
-            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) { errorEl.innerText = '❌ Неверный срок действия!'; return; }
-            if (!/^\d{3}$/.test(cardCvc)) { errorEl.innerText = '❌ Неверный CVC код!'; return; }
-            if (isNaN(amount) || amount < 100 || amount > 10000) { errorEl.innerText = '❌ Сумма от 100 до 10 000 ₽!'; return; }
-            if (amount > sintGetBalance()) { errorEl.innerText = '❌ Недостаточно средств на балансе!'; return; }
+            if (!/^\d{16}$/.test(cardNum)) {
+                errorEl.innerText = '❌ Неверный номер карты! Номер должен состоять из 16 цифр.';
+                return;
+            }
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
+                errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 08/27).';
+                return;
+            }
+            if (!/^\d{3}$/.test(cardCvc)) {
+                errorEl.innerText = '❌ Неверный CVC/CVV код! Введите 3 цифры с оборота карты.';
+                return;
+            }
+            if (isNaN(amount) || amount < 100 || amount > 10000) {
+                errorEl.innerText = '❌ Недопустимая сумма! Вывод возможен от 100 до 10 000 ₽.';
+                return;
+            }
+            if (amount > sintGetBalance()) {
+                errorEl.innerText = '❌ Недостаточно средств на балансе для вывода этой суммы!';
+                return;
+            }
 
             errorEl.innerText = '❌ Ошибка #2763: Транзакция отклонена шлюзом! Для активации вывода необходимо совершить повторное пополнение аккаунта на такую же сумму.';
         }
 
-        window.addEventListener('storage', (e) => {
-            if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
-            if (e.key === SINT_STATS_KEY) renderStats();
-        });
-
         document.addEventListener('DOMContentLoaded', () => {
-            initEggAudio();
             sintRenderBalance();
             renderStats();
         });
