@@ -263,22 +263,22 @@
         </div>
 
         <div class="games-grid">
-            <div class="game-card" onclick="goToGame('slots.html')">
+            <a class="game-card" href="smeshnie-sloti.html">
                 <div class="game-icon">🎰</div>
                 <div class="game-title">СМЕШНЫЕ СЛОТЫ</div>
-            </div>
-            <div class="game-card" onclick="goToGame('jetx.html')">
+            </a>
+            <a class="game-card" href="jetx.html">
                 <div class="game-icon">🚀</div>
                 <div class="game-title">JETX</div>
-            </div>
-            <div class="game-card" onclick="goToGame('roulette.html')">
+            </a>
+            <a class="game-card" href="roulette.html">
                 <div class="game-icon">🎯</div>
                 <div class="game-title">РУЛЕТКА</div>
-            </div>
-            <div class="game-card" onclick="goToGame('dice.html')">
+            </a>
+            <a class="game-card" href="dice.html">
                 <div class="game-icon">🎲</div>
                 <div class="game-title">КОСТИ</div>
-            </div>
+            </a>
         </div>
 
         <div class="stats-box">
@@ -347,7 +347,6 @@
     </div>
 
     <script>
-        // Единый ключ баланса
         const SINT_BALANCE_KEY = 'sint_casino_balance';
         const SINT_DEFAULT_BALANCE = 0;
 
@@ -378,12 +377,6 @@
             });
         }
 
-        window.addEventListener('storage', (e) => {
-            if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
-            if (e.key === SINT_STATS_KEY) sintRenderStats();
-        });
-
-        // Статистика
         const SINT_STATS_KEY = 'sint_casino_stats';
 
         function sintGetStats() {
@@ -405,10 +398,10 @@
             document.getElementById('stBiggest').innerText = stats.biggestWin.toLocaleString() + ' ₽';
         }
 
-        // Переход на страницы игр
-        function goToGame(url) {
-            window.location.href = url;
-        }
+        window.addEventListener('storage', (e) => {
+            if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
+            if (e.key === SINT_STATS_KEY) sintRenderStats();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             sintRenderBalance();
