@@ -42,8 +42,9 @@
             text-decoration: none;
             border-radius: 8px;
             padding: 5px 10px;
-            font-size: 0.8rem;
+            font-size: 1.1rem;
             font-weight: bold;
+            line-height: 1;
             transition: transform 0.1s;
         }
 
@@ -285,7 +286,7 @@
 <body>
 
     <div class="casino-card">
-        <a href="index.html" class="btn-back">⬅ НА ГЛАВНУЮ</a>
+        <a href="index.html" class="btn-back">⬅</a>
         <h1>🎰 SINT-CASINO.COM 🎰</h1>
         <div class="subtitle">СМЕШНЫЕ СЛОТЫ</div>
 
@@ -413,7 +414,22 @@
                 if (!window.sintEggAudio) {
                     window.sintEggAudio = new Audio('egg.mp3');
                     window.sintEggAudio.loop = true;
+
+                    const syncTime = () => {
+                        const startTime = parseFloat(sessionStorage.getItem('sint_egg_start_time'));
+                        if (startTime && window.sintEggAudio.duration) {
+                            const elapsed = (Date.now() - startTime) / 1000;
+                            window.sintEggAudio.currentTime = elapsed % window.sintEggAudio.duration;
+                        }
+                    };
+
+                    if (window.sintEggAudio.readyState >= 1) {
+                        syncTime();
+                    } else {
+                        window.sintEggAudio.addEventListener('loadedmetadata', syncTime);
+                    }
                 }
+
                 window.sintEggAudio.play().catch(() => {
                     const playOnClick = () => {
                         if (window.sintEggAudio) window.sintEggAudio.play();
@@ -630,7 +646,6 @@
             return EMOJI_LIST[Math.floor(Math.random() * EMOJI_LIST.length)];
         }
 
-        // Вращение ленты с воспроизведением щелчка СТРОГО в момент прохождения символа через середину
         function spinReel(stripId, finalSymbol, duration) {
             return new Promise(resolve => {
                 const strip = document.getElementById(stripId);
@@ -655,7 +670,6 @@
 
                     strip.style.transform = `translateY(${currentY}px)`;
 
-                    // Вычисляем пройденный индекс символа
                     const passedIndex = Math.floor(Math.abs(currentY) / SYMBOL_HEIGHT);
                     if (passedIndex > lastPassedIndex) {
                         sintPlaySound(220 + (passedIndex % 4) * 35, 0.05);
