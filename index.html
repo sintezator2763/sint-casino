@@ -41,9 +41,10 @@
             color: #00ffff;
             border-radius: 8px;
             padding: 5px 10px;
-            font-size: 0.85rem;
+            font-size: 1.1rem;
             cursor: pointer;
             font-weight: bold;
+            line-height: 1;
             transition: transform 0.1s;
         }
 
@@ -283,7 +284,7 @@
 <body>
 
     <div class="casino-card">
-        <button class="btn-settings" onclick="openSettingsModal()">⚙️ НАСТРОЙКИ</button>
+        <button class="btn-settings" onclick="openSettingsModal()">⚙️</button>
         <h1>🎲 SINT-CASINO.COM 🎲</h1>
         <div class="subtitle">ГЛАВНАЯ СТРАНИЦА</div>
 
@@ -345,7 +346,6 @@
             </a>
         </div>
 
-        <!-- Модальное окно настроек -->
         <div class="modal" id="settingsModal">
             <div class="modal-content" style="border-color: #ff007f; text-align: center;">
                 <h3 style="color: #ff007f;">⚙️ НАСТРОЙКИ</h3>
@@ -455,7 +455,22 @@
                 if (!window.sintEggAudio) {
                     window.sintEggAudio = new Audio('egg.mp3');
                     window.sintEggAudio.loop = true;
+
+                    const syncTime = () => {
+                        const startTime = parseFloat(sessionStorage.getItem('sint_egg_start_time'));
+                        if (startTime && window.sintEggAudio.duration) {
+                            const elapsed = (Date.now() - startTime) / 1000;
+                            window.sintEggAudio.currentTime = elapsed % window.sintEggAudio.duration;
+                        }
+                    };
+
+                    if (window.sintEggAudio.readyState >= 1) {
+                        syncTime();
+                    } else {
+                        window.sintEggAudio.addEventListener('loadedmetadata', syncTime);
+                    }
                 }
+
                 window.sintEggAudio.play().catch(() => {
                     const playOnClick = () => {
                         if (window.sintEggAudio) window.sintEggAudio.play();
@@ -468,6 +483,9 @@
 
         function activateEgg() {
             sessionStorage.setItem('sint_egg_active', 'true');
+            if (!sessionStorage.getItem('sint_egg_start_time')) {
+                sessionStorage.setItem('sint_egg_start_time', String(Date.now()));
+            }
             sintPlayEggMusic();
             sintRenderBalance();
         }
@@ -523,6 +541,7 @@
                 localStorage.removeItem(SINT_BALANCE_KEY);
                 localStorage.removeItem(SINT_STATS_KEY);
                 sessionStorage.removeItem('sint_egg_active');
+                sessionStorage.removeItem('sint_egg_start_time');
                 if (window.sintEggAudio) {
                     window.sintEggAudio.pause();
                     window.sintEggAudio = null;
