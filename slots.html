@@ -32,6 +32,23 @@
             position: relative;
         }
 
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #1f0036;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .btn-back:hover { transform: scale(1.05); }
+
         h1 {
             font-size: 2rem;
             color: #ffcc00;
@@ -46,7 +63,6 @@
             text-shadow: 0 0 5px #00ffff;
         }
 
-        /* Плашка баланса */
         .balance-bar {
             background: linear-gradient(90deg, #1f0036, #3a0066);
             border: 2px solid #00ff66;
@@ -63,10 +79,7 @@
             gap: 10px;
         }
 
-        .balance-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .balance-actions { display: flex; gap: 8px; }
 
         .balance-bar span.btn-action {
             padding: 4px 10px;
@@ -77,21 +90,10 @@
             transition: transform 0.1s;
         }
 
-        .balance-bar span.btn-action:hover {
-            transform: scale(1.05);
-        }
+        .balance-bar span.btn-action:hover { transform: scale(1.05); }
+        .balance-bar span.plus { background: #00ff66; color: #000; }
+        .balance-bar span.minus { background: #ff3366; color: #fff; }
 
-        .balance-bar span.plus {
-            background: #00ff66;
-            color: #000;
-        }
-
-        .balance-bar span.minus {
-            background: #ff3366;
-            color: #fff;
-        }
-
-        /* Промокоды */
         .promo-box {
             display: flex;
             gap: 5px;
@@ -127,7 +129,6 @@
             min-height: 18px;
         }
 
-        /* Слоты */
         .slot-container {
             background: #000;
             border: 4px solid #ffcc00;
@@ -145,7 +146,6 @@
             margin-bottom: 8px;
         }
 
-        /* Барабаны — реальная прокрутка */
         .reel-window {
             width: 85px;
             height: 105px;
@@ -186,17 +186,9 @@
             text-transform: uppercase;
         }
 
-        .btn-spin:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #b34700;
-        }
+        .btn-spin:active { transform: translateY(3px); box-shadow: 0 2px 0 #b34700; }
+        .btn-spin:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .btn-spin:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        /* Модальные окна */
         .modal {
             display: none;
             position: absolute;
@@ -229,9 +221,7 @@
             font-size: 1.2rem;
         }
 
-        .form-group {
-            margin-bottom: 10px;
-        }
+        .form-group { margin-bottom: 10px; }
 
         .form-group label {
             display: block;
@@ -250,10 +240,7 @@
             font-size: 0.9rem;
         }
 
-        .form-row {
-            display: flex;
-            gap: 10px;
-        }
+        .form-row { display: flex; gap: 10px; }
 
         .error-msg {
             color: #ff3366;
@@ -276,18 +263,9 @@
             margin-top: 5px;
         }
 
-        .modal-btn.withdraw-btn {
-            background: #ff3366;
-            color: #fff;
-        }
+        .modal-btn.withdraw-btn { background: #ff3366; color: #fff; }
+        .close-btn { background: #444; color: #fff; margin-top: 5px; }
 
-        .close-btn {
-            background: #444;
-            color: #fff;
-            margin-top: 5px;
-        }
-
-        /* Модалка ДЖЕКПОТ */
         .jackpot-title {
             font-size: 2.2rem;
             color: #ffcc00;
@@ -307,6 +285,7 @@
 <body>
 
     <div class="casino-card">
+        <a href="index.html" class="btn-back">⬅ НА ГЛАВНУЮ</a>
         <h1>🎰 SINT-CASINO.COM 🎰</h1>
         <div class="subtitle">СМЕШНЫЕ СЛОТЫ</div>
 
@@ -396,98 +375,106 @@
     </div>
 
     <script>
-// =========================================================
-// 💾 ОБЩИЙ БАЛАНС ДЛЯ ВСЕХ ИГР SINT-CASINO (localStorage)
-// =========================================================
+        const SINT_BALANCE_KEY = 'sint_casino_balance';
+        const SINT_DEFAULT_BALANCE = 0;
 
-const SINT_BALANCE_KEY = 'sint_casino_balance';
-const SINT_DEFAULT_BALANCE = 0;
+        function sintGetBalance() {
+            const raw = localStorage.getItem(SINT_BALANCE_KEY);
+            if (raw === null) {
+                localStorage.setItem(SINT_BALANCE_KEY, String(SINT_DEFAULT_BALANCE));
+                return SINT_DEFAULT_BALANCE;
+            }
+            const val = parseFloat(raw);
+            return isNaN(val) ? 0 : val;
+        }
 
-function sintGetBalance() {
-    const raw = localStorage.getItem(SINT_BALANCE_KEY);
-    if (raw === null) {
-        localStorage.setItem(SINT_BALANCE_KEY, String(SINT_DEFAULT_BALANCE));
-        return SINT_DEFAULT_BALANCE;
-    }
-    const val = parseFloat(raw);
-    return isNaN(val) ? 0 : val;
-}
+        function sintSetBalance(newVal) {
+            const rounded = Math.max(0, Math.round(newVal));
+            localStorage.setItem(SINT_BALANCE_KEY, String(rounded));
+            sintRenderBalance();
+            return rounded;
+        }
 
-function sintSetBalance(newVal) {
-    const rounded = Math.max(0, Math.round(newVal));
-    localStorage.setItem(SINT_BALANCE_KEY, String(rounded));
-    sintRenderBalance();
-    return rounded;
-}
+        function sintAddBalance(delta) {
+            return sintSetBalance(sintGetBalance() + delta);
+        }
 
-function sintAddBalance(delta) {
-    return sintSetBalance(sintGetBalance() + delta);
-}
+        function sintRenderBalance() {
+            const isEgg = sessionStorage.getItem('sint_egg_active') === 'true';
+            const eggSuffix = isEgg ? ', 🥚' : '';
+            const balContainer = document.querySelector('.balance-bar > div:first-child');
+            if (balContainer) {
+                balContainer.innerHTML = `💰 БАЛАНС: <span id="balanceVal">${sintGetBalance().toLocaleString()}</span> ₽${eggSuffix}`;
+            }
+        }
 
-function sintRenderBalance() {
-    document.querySelectorAll('#balanceVal').forEach(el => {
-        el.innerText = sintGetBalance().toLocaleString();
-    });
-}
+        function sintPlayEggMusic() {
+            if (sessionStorage.getItem('sint_egg_active') === 'true') {
+                if (!window.sintEggAudio) {
+                    window.sintEggAudio = new Audio('egg.mp3');
+                    window.sintEggAudio.loop = true;
+                }
+                window.sintEggAudio.play().catch(() => {
+                    const playOnClick = () => {
+                        if (window.sintEggAudio) window.sintEggAudio.play();
+                        document.removeEventListener('click', playOnClick);
+                    };
+                    document.addEventListener('click', playOnClick);
+                });
+            }
+        }
 
-// Синхронизация баланса между открытыми вкладками/играми в реальном времени
-window.addEventListener('storage', (e) => {
-    if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
-});
+        window.addEventListener('storage', (e) => {
+            if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
+        });
 
-// --- Общий звук (простой бипер на Web Audio API) ---
-let sintAudioCtx = null;
-function sintPlaySound(freq, duration = 0.1) {
-    try {
-        if (!sintAudioCtx) sintAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (sintAudioCtx.state === 'suspended') sintAudioCtx.resume();
-        let osc = sintAudioCtx.createOscillator();
-        let gain = sintAudioCtx.createGain();
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.04, sintAudioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, sintAudioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(sintAudioCtx.destination);
-        osc.start();
-        osc.stop(sintAudioCtx.currentTime + duration);
-    } catch (e) {}
-}
+        let sintAudioCtx = null;
+        function sintPlaySound(freq, duration = 0.08) {
+            try {
+                if (!sintAudioCtx) sintAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (sintAudioCtx.state === 'suspended') sintAudioCtx.resume();
+                let osc = sintAudioCtx.createOscillator();
+                let gain = sintAudioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.05, sintAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, sintAudioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(sintAudioCtx.destination);
+                osc.start();
+                osc.stop(sintAudioCtx.currentTime + duration);
+            } catch (e) {}
+        }
 
+        const SINT_STATS_KEY = 'sint_casino_stats';
 
-// =========================================================
-// 📊 ОБЩАЯ СТАТИСТИКА ДЛЯ ВСЕХ ИГР (localStorage)
-// =========================================================
+        function sintGetStats() {
+            const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
+            const raw = localStorage.getItem(SINT_STATS_KEY);
+            if (!raw) return defaults;
+            try {
+                return Object.assign({}, defaults, JSON.parse(raw));
+            } catch (e) {
+                return defaults;
+            }
+        }
 
-const SINT_STATS_KEY = 'sint_casino_stats';
+        function sintRecordRound(game, wagered, won) {
+            const stats = sintGetStats();
+            stats.spins += 1;
+            stats.wagered += wagered;
+            stats.won += won;
+            if (won > stats.biggestWin) stats.biggestWin = won;
+            if (stats[game] !== undefined) stats[game] += 1;
+            localStorage.setItem(SINT_STATS_KEY, JSON.stringify(stats));
+        }
 
-function sintGetStats() {
-    const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
-    const raw = localStorage.getItem(SINT_STATS_KEY);
-    if (!raw) return defaults;
-    try {
-        return Object.assign({}, defaults, JSON.parse(raw));
-    } catch (e) {
-        return defaults;
-    }
-}
-
-function sintRecordRound(game, wagered, won) {
-    const stats = sintGetStats();
-    stats.spins += 1;
-    stats.wagered += wagered;
-    stats.won += won;
-    if (won > stats.biggestWin) stats.biggestWin = won;
-    if (stats[game] !== undefined) stats[game] += 1;
-    localStorage.setItem(SINT_STATS_KEY, JSON.stringify(stats));
-}
-
-document.addEventListener('DOMContentLoaded', sintRenderBalance);
+        document.addEventListener('DOMContentLoaded', () => {
+            sintRenderBalance();
+            sintPlayEggMusic();
+        });
     </script>
     <script>
-        // =========================================================
-        // ⚙️ НАСТРОЙКИ КАЗИНО
-        // =========================================================
-
         const EMOJI_LIST = ['💸', '🪲', '🐑', '🧤', '👑', '💎', '💰', '🚀', '🌽', '🪤', '🌋', '📞'];
 
         const PROMO_CODES = {
@@ -498,23 +485,10 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
         const SPIN_COST = 100;
         const SYMBOL_HEIGHT = 105;
 
-        // =========================================================
-        // 🧠 ЛОГИКА ИГРЫ
-        // =========================================================
-
         let usedPromos = new Set();
 
         document.getElementById('spinCostVal').innerText = SPIN_COST;
 
-        function updateBalanceUI() {
-            sintRenderBalance();
-        }
-
-        function playSound(freq) {
-            sintPlaySound(freq);
-        }
-
-        // --- Промокоды ---
         function activatePromo() {
             const input = document.getElementById('promoInput');
             const msg = document.getElementById('promoMsg');
@@ -541,7 +515,6 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
             }
         }
 
-        // --- Пополнение и Валидация Карты ---
         function openDepositModal() {
             document.getElementById('depositModal').classList.add('active');
             document.getElementById('depositError').innerText = '';
@@ -576,17 +549,14 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
                 errorEl.innerText = '❌ Неверный номер карты! Должно быть 16 цифр.';
                 return;
             }
-
             if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
                 errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 05/28).';
                 return;
             }
-
             if (!/^\d{3}$/.test(cardCvc)) {
                 errorEl.innerText = '❌ Неверный CVC код! Должно быть 3 цифры.';
                 return;
             }
-
             if (isNaN(amount) || amount < 100 || amount > 10000) {
                 errorEl.innerText = '❌ Сумма пополнения должна быть от 100 до 10 000 ₽!';
                 return;
@@ -602,7 +572,6 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
             document.getElementById('depositAmount').value = '';
         }
 
-        // --- Вывод средств ---
         function openWithdrawModal() {
             document.getElementById('withdrawModal').classList.add('active');
             document.getElementById('withdrawError').innerText = '';
@@ -633,52 +602,40 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
             const amount = parseInt(document.getElementById('withdrawAmount').value);
             const errorEl = document.getElementById('withdrawError');
 
-            // 1. Проверка номера карты (16 цифр)
             if (!/^\d{16}$/.test(cardNum)) {
                 errorEl.innerText = '❌ Неверный номер карты! Номер должен состоять из 16 цифр.';
                 return;
             }
-
-            // 2. Проверка срока действия (MM/YY)
             if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
                 errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 08/27).';
                 return;
             }
-
-            // 3. Проверка CVC (3 цифры)
             if (!/^\d{3}$/.test(cardCvc)) {
                 errorEl.innerText = '❌ Неверный CVC/CVV код! Введите 3 цифры с оборота карты.';
                 return;
             }
-
-            // 4. Проверка корректности суммы
             if (isNaN(amount) || amount < 100 || amount > 10000) {
                 errorEl.innerText = '❌ Недопустимая сумма! Вывод возможен от 100 до 10 000 ₽.';
                 return;
             }
-
-            // 5. Проверка баланса
             if (amount > sintGetBalance()) {
                 errorEl.innerText = '❌ Недостаточно средств на балансе для вывода этой суммы!';
                 return;
             }
 
-            // ЕСЛИ ВСЕ ДАННЫЕ ВВЕДЕНЫ ВЕРНО -> ФЕЙКОВАЯ ОШИБКА КАССЫ
             errorEl.innerText = '❌ Ошибка #2763: Транзакция отклонена шлюзом! Для активации вывода необходимо совершить повторное пополнение аккаунта на такую же сумму.';
         }
 
-        // --- Вращение Слотов (настоящая прокрутка ленты символов) ---
         function randSymbol() {
             return EMOJI_LIST[Math.floor(Math.random() * EMOJI_LIST.length)];
         }
 
-        // Прокручивает одну ленту до заданного итогового символа за duration мс
+        // Вращение ленты с воспроизведением щелчка СТРОГО в момент прохождения символа через середину
         function spinReel(stripId, finalSymbol, duration) {
             return new Promise(resolve => {
                 const strip = document.getElementById(stripId);
-                const EXTRA = 18; // сколько "лишних" символов проматываем для эффекта скорости
+                const EXTRA = 18;
 
-                // Строим ленту: случайные символы + финальный в конце
                 let html = '';
                 for (let i = 0; i < EXTRA; i++) {
                     html += `<div class="reel-symbol">${randSymbol()}</div>`;
@@ -686,17 +643,33 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
                 html += `<div class="reel-symbol">${finalSymbol}</div>`;
                 strip.innerHTML = html;
 
-                // Сбрасываем позицию без анимации
-                strip.style.transition = 'none';
-                strip.style.transform = 'translateY(0px)';
-                // Форсируем reflow, чтобы браузер применил сброс перед стартом анимации
-                void strip.offsetHeight;
-
                 const targetY = -(EXTRA * SYMBOL_HEIGHT);
-                strip.style.transition = `transform ${duration}ms cubic-bezier(0.15, 0.85, 0.25, 1)`;
-                strip.style.transform = `translateY(${targetY}px)`;
+                const startTime = performance.now();
+                let lastPassedIndex = 0;
 
-                setTimeout(resolve, duration);
+                function animate(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const ease = 1 - Math.pow(1 - progress, 3);
+                    const currentY = ease * targetY;
+
+                    strip.style.transform = `translateY(${currentY}px)`;
+
+                    // Вычисляем пройденный индекс символа
+                    const passedIndex = Math.floor(Math.abs(currentY) / SYMBOL_HEIGHT);
+                    if (passedIndex > lastPassedIndex) {
+                        sintPlaySound(220 + (passedIndex % 4) * 35, 0.05);
+                        lastPassedIndex = passedIndex;
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        strip.style.transform = `translateY(${targetY}px)`;
+                        resolve();
+                    }
+                }
+                requestAnimationFrame(animate);
             });
         }
 
@@ -715,25 +688,20 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
             const btn = document.getElementById('spinBtn');
             btn.disabled = true;
 
-            // Итог каждого барабана известен заранее, но игрок видит его только когда лента доезжает
             const res1 = randSymbol();
             const res2 = randSymbol();
             const res3 = randSymbol();
-
-            let tickTimer = setInterval(() => playSound(180 + Math.random() * 100), 90);
 
             Promise.all([
                 spinReel('strip1', res1, 900),
                 spinReel('strip2', res2, 1400),
                 spinReel('strip3', res3, 1900)
             ]).then(() => {
-                clearInterval(tickTimer);
                 btn.disabled = false;
                 checkWin(res1, res2, res3);
             });
         }
 
-        // Проверка выигрыша
         function checkWin(e1, e2, e3) {
             const msg = document.getElementById('promoMsg');
             let roundWin = 0;
@@ -774,7 +742,6 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
         function closeJackpotModal() {
             document.getElementById('jackpotModal').classList.remove('active');
         }
-
     </script>
 </body>
 </html>
