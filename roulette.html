@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINT-CASINO.COM — Рулетка</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial Black', 'Impact', sans-serif;
+        }
+
+        body {
+            background: #080012;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .casino-card {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            background: radial-gradient(circle, #1a002c 0%, #05000a 100%);
+            border: 4px solid #ff007f;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 0 25px #ff007f;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff0055;
+            margin-bottom: 2px;
+        }
+
+        .subtitle {
+            color: #00ffff;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .balance-bar {
+            background: linear-gradient(90deg, #1f0036, #3a0066);
+            border: 2px solid #00ff66;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            color: #00ff66;
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .balance-bar span.btn-action {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .balance-bar span.btn-action:hover {
+            transform: scale(1.05);
+        }
+
+        .balance-bar span.plus {
+            background: #00ff66;
+            color: #000;
+        }
+
+        .balance-bar span.minus {
+            background: #ff3366;
+            color: #fff;
+        }
+
+        /* Колесо-дисплей */
+        .wheel-display {
+            background: #000;
+            border: 4px solid #ffcc00;
+            border-radius: 15px;
+            padding: 25px 15px;
+            margin: 10px 0;
+        }
+
+        .wheel-number {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 900;
+            border: 5px solid #444;
+            background: #222;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .wheel-number.red { background: #b3002d; border-color: #ff3366; }
+        .wheel-number.black { background: #111; border-color: #888; }
+        .wheel-number.green { background: #00733e; border-color: #00ff66; }
+
+        .wheel-number.spinning {
+            animation: pulseSpin 0.15s infinite;
+        }
+
+        @keyframes pulseSpin {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+
+        .result-label {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #aaa;
+            min-height: 20px;
+        }
+
+        /* Ставки */
+        .bet-amount-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0 10px;
+        }
+
+        .bet-amount-row label {
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .bet-amount-row input {
+            width: 120px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #ffcc00;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .chip-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: #1f0036;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .chip:hover { transform: scale(1.05); }
+
+        .bet-type-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .bet-btn {
+            border: 2px solid #ff007f;
+            background: #1a002c;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            min-width: 90px;
+        }
+
+        .bet-btn.selected {
+            background: #ff007f;
+            box-shadow: 0 0 12px #ff007f;
+        }
+
+        .bet-btn.red-opt { border-color: #ff3366; }
+        .bet-btn.red-opt.selected { background: #ff3366; box-shadow: 0 0 12px #ff3366; }
+
+        .bet-btn.black-opt { border-color: #888; }
+        .bet-btn.black-opt.selected { background: #333; box-shadow: 0 0 12px #888; }
+
+        .straight-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .straight-row input {
+            width: 80px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #00ffff;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .payout-hint {
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .btn-spin {
+            background: linear-gradient(180deg, #ffcc00, #ff6600);
+            border: none;
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 12px 35px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b34700;
+            text-transform: uppercase;
+        }
+
+        .btn-spin:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #b34700;
+        }
+
+        .btn-spin:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.93);
+            border-radius: 20px;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #140024;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .form-group { margin-bottom: 10px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #ccc;
+            margin-bottom: 3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ff007f;
+            background: #000;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .form-row { display: flex; gap: 10px; }
+
+        .error-msg {
+            color: #ff3366;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .modal-btn {
+            width: 100%;
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .modal-btn.withdraw-btn { background: #ff3366; color: #fff; }
+        .close-btn { background: #444; color: #fff; margin-top: 5px; }
+
+        .win-amount {
+            font-size: 2rem;
+            color: #00ff66;
+            margin: 15px 0;
+            text-shadow: 0 0 10px #00ff66;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="casino-card">
+        <h1>🎡 SINT-CASINO.COM 🎡</h1>
+        <div class="subtitle">РУЛЕТКА</div>
+
+        <div class="balance-bar">
+            <div>💰 БАЛАНС: <span id="balanceVal">0</span> ₽</div>
+            <div class="balance-actions">
+                <span class="btn-action plus" onclick="openDepositModal()">+ ПОПОЛНИТЬ</span>
+                <span class="btn-action minus" onclick="openWithdrawModal()">- ВЫВЕСТИ</span>
+            </div>
+        </div>
+
+        <div class="wheel-display">
+            <div class="wheel-number" id="wheelNum">0</div>
+            <div class="result-label" id="resultLabel">Сделайте ставку и крутите колесо</div>
+        </div>
+
+        <div class="bet-amount-row">
+            <label for="betAmount">Ставка:</label>
+            <input type="number" id="betAmount" value="100" min="10">
+            <span>₽</span>
+        </div>
+        <div class="chip-row">
+            <span class="chip" onclick="setBet(50)">+50</span>
+            <span class="chip" onclick="setBet(100)">+100</span>
+            <span class="chip" onclick="setBet(500)">+500</span>
+            <span class="chip" onclick="setBet(1000)">+1000</span>
+            <span class="chip" onclick="setBetMax()">MAX</span>
+        </div>
+
+        <div class="bet-type-grid">
+            <button class="bet-btn red-opt" data-type="red" onclick="selectBetType('red')">🔴 Красное (x2)</button>
+            <button class="bet-btn black-opt" data-type="black" onclick="selectBetType('black')">⚫ Чёрное (x2)</button>
+            <button class="bet-btn" data-type="even" onclick="selectBetType('even')">Чётное (x2)</button>
+            <button class="bet-btn" data-type="odd" onclick="selectBetType('odd')">Нечётное (x2)</button>
+            <button class="bet-btn" data-type="straight" onclick="selectBetType('straight')">Число (x36)</button>
+        </div>
+
+        <div class="straight-row" id="straightRow" style="display:none;">
+            <label for="straightNumber">Число (0-36):</label>
+            <input type="number" id="straightNumber" min="0" max="36" value="7">
+        </div>
+
+        <div class="payout-hint">Выбранная ставка подсвечена. 0 не относится ни к красным, ни к чёрным, ни к чётным/нечётным.</div>
+
+        <button class="btn-spin" id="spinBtn" onclick="spinWheel()">КРУТИТЬ 🎡</button>
+
+        <div class="modal" id="depositModal">
+            <div class="modal-content">
+                <h3>💳 ПОПОЛНЕНИЕ БАЛАНСА</h3>
+                <div class="form-group">
+                    <label>Номер карты (16 цифр):</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="width: 50%;">
+                        <label>Срок (ММ/ГГ):</label>
+                        <input type="text" id="cardExp" placeholder="ММ/ГГ" maxlength="5">
+                    </div>
+                    <div class="form-group" style="width: 50%;">
+                        <label>CVC / CVV:</label>
+                        <input type="password" id="cardCvc" placeholder="000" maxlength="3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Сумма пополнения (от 100 до 10 000 ₽):</label>
+                    <input type="number" id="depositAmount" placeholder="1000" min="100" max="10000">
+                </div>
+                <div id="depositError" class="error-msg"></div>
+                <button class="modal-btn" onclick="processDeposit()">ПОПОЛНИТЬ</button>
+                <button class="modal-btn close-btn" onclick="closeDepositModal()">ОТМЕНА</button>
+            </div>
+        </div>
+
+        <div class="modal" id="withdrawModal">
+            <div class="modal-content" style="border-color: #ff3366;">
+                <h3 style="color: #ff3366;">💸 ВЫВОД СРЕДСТВ</h3>
+                <div class="form-group">
+                    <label>Номер карты для получения (16 цифр):</label>
+                    <input type="text" id="withdrawCardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="width: 50%;">
+                        <label>Срок (ММ/ГГ):</label>
+                        <input type="text" id="withdrawCardExp" placeholder="ММ/ГГ" maxlength="5">
+                    </div>
+                    <div class="form-group" style="width: 50%;">
+                        <label>CVC / CVV:</label>
+                        <input type="password" id="withdrawCardCvc" placeholder="000" maxlength="3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Сумма вывода (от 100 до 10 000 ₽):</label>
+                    <input type="number" id="withdrawAmount" placeholder="1000" min="100" max="10000">
+                </div>
+                <div id="withdrawError" class="error-msg"></div>
+                <button class="modal-btn withdraw-btn" onclick="processWithdraw()">ВЫВЕСТИ СРЕДСТВА</button>
+                <button class="modal-btn close-btn" onclick="closeWithdrawModal()">ОТМЕНА</button>
+            </div>
+        </div>
+
+        <div class="modal" id="winModal">
+            <div class="jackpot-title" style="font-size:2rem;color:#ffcc00;text-shadow:0 0 15px #ff0055;">🎉 ПОБЕДА! 🎉</div>
+            <div class="win-amount" id="winCounter">0 ₽</div>
+            <button class="btn-spin" onclick="closeWinModal()">ЗАБРАТЬ 💸</button>
+        </div>
+    </div>
+
+    <script>
+// =========================================================
+// 💾 ОБЩИЙ БАЛАНС ДЛЯ ВСЕХ ИГР SINT-CASINO (localStorage)
+// =========================================================
+
+const SINT_BALANCE_KEY = 'sint_casino_balance';
+const SINT_DEFAULT_BALANCE = 0;
+
+function sintGetBalance() {
+    const raw = localStorage.getItem(SINT_BALANCE_KEY);
+    if (raw === null) {
+        localStorage.setItem(SINT_BALANCE_KEY, String(SINT_DEFAULT_BALANCE));
+        return SINT_DEFAULT_BALANCE;
+    }
+    const val = parseFloat(raw);
+    return isNaN(val) ? 0 : val;
+}
+
+function sintSetBalance(newVal) {
+    const rounded = Math.max(0, Math.round(newVal));
+    localStorage.setItem(SINT_BALANCE_KEY, String(rounded));
+    sintRenderBalance();
+    return rounded;
+}
+
+function sintAddBalance(delta) {
+    return sintSetBalance(sintGetBalance() + delta);
+}
+
+function sintRenderBalance() {
+    document.querySelectorAll('#balanceVal').forEach(el => {
+        el.innerText = sintGetBalance().toLocaleString();
+    });
+}
+
+// Синхронизация баланса между открытыми вкладками/играми в реальном времени
+window.addEventListener('storage', (e) => {
+    if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
+});
+
+// --- Общий звук (простой бипер на Web Audio API) ---
+let sintAudioCtx = null;
+function sintPlaySound(freq, duration = 0.1) {
+    try {
+        if (!sintAudioCtx) sintAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (sintAudioCtx.state === 'suspended') sintAudioCtx.resume();
+        let osc = sintAudioCtx.createOscillator();
+        let gain = sintAudioCtx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.04, sintAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, sintAudioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(sintAudioCtx.destination);
+        osc.start();
+        osc.stop(sintAudioCtx.currentTime + duration);
+    } catch (e) {}
+}
+
+
+// =========================================================
+// 📊 ОБЩАЯ СТАТИСТИКА ДЛЯ ВСЕХ ИГР (localStorage)
+// =========================================================
+
+const SINT_STATS_KEY = 'sint_casino_stats';
+
+function sintGetStats() {
+    const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
+    const raw = localStorage.getItem(SINT_STATS_KEY);
+    if (!raw) return defaults;
+    try {
+        return Object.assign({}, defaults, JSON.parse(raw));
+    } catch (e) {
+        return defaults;
+    }
+}
+
+function sintRecordRound(game, wagered, won) {
+    const stats = sintGetStats();
+    stats.spins += 1;
+    stats.wagered += wagered;
+    stats.won += won;
+    if (won > stats.biggestWin) stats.biggestWin = won;
+    if (stats[game] !== undefined) stats[game] += 1;
+    localStorage.setItem(SINT_STATS_KEY, JSON.stringify(stats));
+}
+
+document.addEventListener('DOMContentLoaded', sintRenderBalance);
+    </script>
+    <script>
+        // =========================================================
+        // ⚙️ НАСТРОЙКИ РУЛЕТКИ
+        // =========================================================
+
+        const RED_NUMBERS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+        let selectedType = 'red';
+
+        function numberColor(n) {
+            if (n === 0) return 'green';
+            return RED_NUMBERS.has(n) ? 'red' : 'black';
+        }
+
+        function selectBetType(type) {
+            selectedType = type;
+            document.querySelectorAll('.bet-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelector(`.bet-btn[data-type="${type}"]`).classList.add('selected');
+            document.getElementById('straightRow').style.display = (type === 'straight') ? 'flex' : 'none';
+        }
+        selectBetType('red');
+
+        function setBet(amount) {
+            const input = document.getElementById('betAmount');
+            input.value = (parseInt(input.value) || 0) + amount;
+        }
+
+        function setBetMax() {
+            document.getElementById('betAmount').value = sintGetBalance();
+        }
+
+        function spinWheel() {
+            const label = document.getElementById('resultLabel');
+            const wheel = document.getElementById('wheelNum');
+            const btn = document.getElementById('spinBtn');
+            const bet = parseInt(document.getElementById('betAmount').value);
+
+            label.style.color = '#ff3366';
+
+            if (isNaN(bet) || bet < 10) {
+                label.innerText = '❌ Минимальная ставка — 10 ₽';
+                return;
+            }
+            if (bet > sintGetBalance()) {
+                label.innerText = '❌ Недостаточно средств на балансе!';
+                return;
+            }
+            if (selectedType === 'straight') {
+                const num = parseInt(document.getElementById('straightNumber').value);
+                if (isNaN(num) || num < 0 || num > 36) {
+                    label.innerText = '❌ Число должно быть от 0 до 36';
+                    return;
+                }
+            }
+
+            // Списываем ставку сразу
+            sintAddBalance(-bet);
+            btn.disabled = true;
+            label.style.color = '#aaa';
+            label.innerText = 'Колесо крутится...';
+
+            wheel.classList.add('spinning');
+            let tick = setInterval(() => {
+                const n = Math.floor(Math.random() * 37);
+                wheel.innerText = n;
+                wheel.className = 'wheel-number spinning ' + numberColor(n);
+                sintPlaySound(150 + Math.random() * 200, 0.05);
+            }, 80);
+
+            setTimeout(() => {
+                clearInterval(tick);
+                wheel.classList.remove('spinning');
+
+                const result = Math.floor(Math.random() * 37);
+                const color = numberColor(result);
+                wheel.innerText = result;
+                wheel.className = 'wheel-number ' + color;
+
+                resolveBet(result, color, bet);
+                btn.disabled = false;
+            }, 2200);
+        }
+
+        function resolveBet(result, color, bet) {
+            const label = document.getElementById('resultLabel');
+            let win = 0;
+
+            if (selectedType === 'red' && color === 'red') win = bet * 2;
+            else if (selectedType === 'black' && color === 'black') win = bet * 2;
+            else if (selectedType === 'even' && result !== 0 && result % 2 === 0) win = bet * 2;
+            else if (selectedType === 'odd' && result % 2 === 1) win = bet * 2;
+            else if (selectedType === 'straight') {
+                const num = parseInt(document.getElementById('straightNumber').value);
+                if (num === result) win = bet * 36;
+            }
+
+            sintRecordRound('roulette', bet, win);
+
+            if (win > 0) {
+                sintAddBalance(win);
+                label.style.color = '#00ff66';
+                label.innerText = `Выпало ${result} (${colorRu(color)})! Вы выиграли ${win.toLocaleString()} ₽`;
+                if (win >= bet * 10) showWinModal(win);
+            } else {
+                label.style.color = '#ff3366';
+                label.innerText = `Выпало ${result} (${colorRu(color)}). Не повезло, попробуйте ещё раз.`;
+            }
+        }
+
+        function colorRu(c) {
+            if (c === 'red') return 'красное';
+            if (c === 'black') return 'чёрное';
+            return 'зеро';
+        }
+
+        function showWinModal(win) {
+            document.getElementById('winModal').classList.add('active');
+            document.getElementById('winCounter').innerText = win.toLocaleString() + ' ₽';
+        }
+
+        function closeWinModal() {
+            document.getElementById('winModal').classList.remove('active');
+        }
+
+        // --- Пополнение (карта не проверяется по-настоящему, это демо) ---
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('active');
+            document.getElementById('depositError').innerText = '';
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('active');
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            val = val.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = val.substring(0, 19);
+        });
+
+        document.getElementById('cardExp').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
+            e.target.value = val.substring(0, 5);
+        });
+
+        function processDeposit() {
+            const cardNum = document.getElementById('cardNumber').value.replace(/\s+/g, '');
+            const cardExp = document.getElementById('cardExp').value;
+            const cardCvc = document.getElementById('cardCvc').value;
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            const errorEl = document.getElementById('depositError');
+
+            if (!/^\d{16}$/.test(cardNum)) {
+                errorEl.innerText = '❌ Неверный номер карты! Должно быть 16 цифр.';
+                return;
+            }
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
+                errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 05/28).';
+                return;
+            }
+            if (!/^\d{3}$/.test(cardCvc)) {
+                errorEl.innerText = '❌ Неверный CVC код! Должно быть 3 цифры.';
+                return;
+            }
+            if (isNaN(amount) || amount < 100 || amount > 10000) {
+                errorEl.innerText = '❌ Сумма пополнения должна быть от 100 до 10 000 ₽!';
+                return;
+            }
+
+            sintAddBalance(amount);
+            closeDepositModal();
+            alert(`Успешно! Баланс пополнен на ${amount.toLocaleString()} ₽`);
+
+            document.getElementById('cardNumber').value = '';
+            document.getElementById('cardExp').value = '';
+            document.getElementById('cardCvc').value = '';
+            document.getElementById('depositAmount').value = '';
+        }
+
+        // --- Вывод средств (механика намеренно не изменена) ---
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('active');
+            document.getElementById('withdrawError').innerText = '';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('active');
+        }
+
+        document.getElementById('withdrawCardNumber').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            val = val.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = val.substring(0, 19);
+        });
+
+        document.getElementById('withdrawCardExp').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
+            e.target.value = val.substring(0, 5);
+        });
+
+        function processWithdraw() {
+            const cardNum = document.getElementById('withdrawCardNumber').value.replace(/\s+/g, '');
+            const cardExp = document.getElementById('withdrawCardExp').value;
+            const cardCvc = document.getElementById('withdrawCardCvc').value;
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const errorEl = document.getElementById('withdrawError');
+
+            if (!/^\d{16}$/.test(cardNum)) {
+                errorEl.innerText = '❌ Неверный номер карты! Номер должен состоять из 16 цифр.';
+                return;
+            }
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
+                errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 08/27).';
+                return;
+            }
+            if (!/^\d{3}$/.test(cardCvc)) {
+                errorEl.innerText = '❌ Неверный CVC/CVV код! Введите 3 цифры с оборота карты.';
+                return;
+            }
+            if (isNaN(amount) || amount < 100 || amount > 10000) {
+                errorEl.innerText = '❌ Недопустимая сумма! Вывод возможен от 100 до 10 000 ₽.';
+                return;
+            }
+            if (amount > sintGetBalance()) {
+                errorEl.innerText = '❌ Недостаточно средств на балансе для вывода этой суммы!';
+                return;
+            }
+
+            errorEl.innerText = '❌ Ошибка #2763: Транзакция отклонена шлюзом! Для активации вывода необходимо совершить повторное пополнение аккаунта на такую же сумму.';
+        }
+    </script>
+</body>
+</html>

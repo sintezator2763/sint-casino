@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SINT-CASINO.COM — JetX</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial Black', 'Impact', sans-serif;
+        }
+
+        body {
+            background: #080012;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        .casino-card {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            background: radial-gradient(circle, #1a002c 0%, #05000a 100%);
+            border: 4px solid #ff007f;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 0 25px #ff007f;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ff0055;
+            margin-bottom: 2px;
+        }
+
+        .subtitle {
+            color: #00ffff;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ffff;
+        }
+
+        .balance-bar {
+            background: linear-gradient(90deg, #1f0036, #3a0066);
+            border: 2px solid #00ff66;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 1.2rem;
+            color: #00ff66;
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .balance-actions { display: flex; gap: 8px; }
+
+        .balance-bar span.btn-action {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .balance-bar span.btn-action:hover { transform: scale(1.05); }
+        .balance-bar span.plus { background: #00ff66; color: #000; }
+        .balance-bar span.minus { background: #ff3366; color: #fff; }
+
+        /* Игровое поле JetX */
+        .flight-box {
+            background: linear-gradient(180deg, #0a0018 0%, #1a002c 100%);
+            border: 4px solid #ffcc00;
+            border-radius: 15px;
+            height: 220px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flight-trail {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 0%;
+            background: linear-gradient(0deg, rgba(255,0,127,0.35), rgba(255,204,0,0.05));
+            border-top: 2px solid #ff007f;
+            transition: width 0.1s linear, height 0.1s linear;
+        }
+
+        .rocket {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 2.2rem;
+            transform: rotate(45deg);
+            transition: bottom 0.1s linear, left 0.1s linear;
+        }
+
+        .multiplier-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 900;
+            color: #00ff66;
+            text-shadow: 0 0 15px #00ff66;
+        }
+
+        .multiplier-display.crashed {
+            color: #ff3366;
+            text-shadow: 0 0 15px #ff3366;
+        }
+
+        .flight-status {
+            position: absolute;
+            top: 12px;
+            left: 0;
+            width: 100%;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        /* Ставка */
+        .bet-amount-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0 10px;
+        }
+
+        .bet-amount-row label { font-size: 0.85rem; color: #ccc; }
+
+        .bet-amount-row input {
+            width: 120px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #ffcc00;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .chip-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            background: #1f0036;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .chip:hover { transform: scale(1.05); }
+
+        .action-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-spin {
+            background: linear-gradient(180deg, #ffcc00, #ff6600);
+            border: none;
+            color: #000;
+            font-size: 1.3rem;
+            font-weight: 900;
+            padding: 12px 28px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #b34700;
+            text-transform: uppercase;
+        }
+
+        .btn-spin:active { transform: translateY(3px); box-shadow: 0 2px 0 #b34700; }
+        .btn-spin:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-cashout {
+            background: linear-gradient(180deg, #00ff66, #009944);
+            box-shadow: 0 5px 0 #005c28;
+        }
+
+        .btn-cashout:active { box-shadow: 0 2px 0 #005c28; }
+
+        .history-row {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin: 12px 0 0;
+            flex-wrap: wrap;
+        }
+
+        .history-chip {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .history-chip.low { background: #331; color: #ff8866; }
+        .history-chip.high { background: #113322; color: #00ff88; }
+
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.93);
+            border-radius: 20px;
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #140024;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            padding: 15px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .modal-content h3 {
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .form-group { margin-bottom: 10px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            color: #ccc;
+            margin-bottom: 3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ff007f;
+            background: #000;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+
+        .form-row { display: flex; gap: 10px; }
+
+        .error-msg {
+            color: #ff3366;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .modal-btn {
+            width: 100%;
+            background: #00ff66;
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 5px;
+        }
+
+        .modal-btn.withdraw-btn { background: #ff3366; color: #fff; }
+        .close-btn { background: #444; color: #fff; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="casino-card">
+        <h1>🚀 SINT-CASINO.COM 🚀</h1>
+        <div class="subtitle">JETX — УСПЕЙ ЗАБРАТЬ ДО КРАША</div>
+
+        <div class="balance-bar">
+            <div>💰 БАЛАНС: <span id="balanceVal">0</span> ₽</div>
+            <div class="balance-actions">
+                <span class="btn-action plus" onclick="openDepositModal()">+ ПОПОЛНИТЬ</span>
+                <span class="btn-action minus" onclick="openWithdrawModal()">- ВЫВЕСТИ</span>
+            </div>
+        </div>
+
+        <div class="flight-box">
+            <div class="flight-status" id="flightStatus">Сделайте ставку до старта раунда</div>
+            <div class="flight-trail" id="flightTrail"></div>
+            <div class="rocket" id="rocket">🚀</div>
+            <div class="multiplier-display" id="multiplierDisplay">1.00x</div>
+        </div>
+
+        <div class="history-row" id="historyRow"></div>
+
+        <div class="bet-amount-row">
+            <label for="betAmount">Ставка:</label>
+            <input type="number" id="betAmount" value="100" min="10">
+            <span>₽</span>
+        </div>
+        <div class="chip-row">
+            <span class="chip" onclick="setBet(50)">+50</span>
+            <span class="chip" onclick="setBet(100)">+100</span>
+            <span class="chip" onclick="setBet(500)">+500</span>
+            <span class="chip" onclick="setBet(1000)">+1000</span>
+            <span class="chip" onclick="setBetMax()">MAX</span>
+        </div>
+
+        <div class="action-row">
+            <button class="btn-spin" id="betBtn" onclick="placeBet()">СТАВКА 🚀</button>
+            <button class="btn-spin btn-cashout" id="cashoutBtn" onclick="cashOut()" disabled>ЗАБРАТЬ 💰</button>
+        </div>
+
+        <div class="modal" id="depositModal">
+            <div class="modal-content">
+                <h3>💳 ПОПОЛНЕНИЕ БАЛАНСА</h3>
+                <div class="form-group">
+                    <label>Номер карты (16 цифр):</label>
+                    <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="width: 50%;">
+                        <label>Срок (ММ/ГГ):</label>
+                        <input type="text" id="cardExp" placeholder="ММ/ГГ" maxlength="5">
+                    </div>
+                    <div class="form-group" style="width: 50%;">
+                        <label>CVC / CVV:</label>
+                        <input type="password" id="cardCvc" placeholder="000" maxlength="3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Сумма пополнения (от 100 до 10 000 ₽):</label>
+                    <input type="number" id="depositAmount" placeholder="1000" min="100" max="10000">
+                </div>
+                <div id="depositError" class="error-msg"></div>
+                <button class="modal-btn" onclick="processDeposit()">ПОПОЛНИТЬ</button>
+                <button class="modal-btn close-btn" onclick="closeDepositModal()">ОТМЕНА</button>
+            </div>
+        </div>
+
+        <div class="modal" id="withdrawModal">
+            <div class="modal-content" style="border-color: #ff3366;">
+                <h3 style="color: #ff3366;">💸 ВЫВОД СРЕДСТВ</h3>
+                <div class="form-group">
+                    <label>Номер карты для получения (16 цифр):</label>
+                    <input type="text" id="withdrawCardNumber" placeholder="0000 0000 0000 0000" maxlength="19">
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="width: 50%;">
+                        <label>Срок (ММ/ГГ):</label>
+                        <input type="text" id="withdrawCardExp" placeholder="ММ/ГГ" maxlength="5">
+                    </div>
+                    <div class="form-group" style="width: 50%;">
+                        <label>CVC / CVV:</label>
+                        <input type="password" id="withdrawCardCvc" placeholder="000" maxlength="3">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Сумма вывода (от 100 до 10 000 ₽):</label>
+                    <input type="number" id="withdrawAmount" placeholder="1000" min="100" max="10000">
+                </div>
+                <div id="withdrawError" class="error-msg"></div>
+                <button class="modal-btn withdraw-btn" onclick="processWithdraw()">ВЫВЕСТИ СРЕДСТВА</button>
+                <button class="modal-btn close-btn" onclick="closeWithdrawModal()">ОТМЕНА</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// =========================================================
+// 💾 ОБЩИЙ БАЛАНС ДЛЯ ВСЕХ ИГР SINT-CASINO (localStorage)
+// =========================================================
+
+const SINT_BALANCE_KEY = 'sint_casino_balance';
+const SINT_DEFAULT_BALANCE = 0;
+
+function sintGetBalance() {
+    const raw = localStorage.getItem(SINT_BALANCE_KEY);
+    if (raw === null) {
+        localStorage.setItem(SINT_BALANCE_KEY, String(SINT_DEFAULT_BALANCE));
+        return SINT_DEFAULT_BALANCE;
+    }
+    const val = parseFloat(raw);
+    return isNaN(val) ? 0 : val;
+}
+
+function sintSetBalance(newVal) {
+    const rounded = Math.max(0, Math.round(newVal));
+    localStorage.setItem(SINT_BALANCE_KEY, String(rounded));
+    sintRenderBalance();
+    return rounded;
+}
+
+function sintAddBalance(delta) {
+    return sintSetBalance(sintGetBalance() + delta);
+}
+
+function sintRenderBalance() {
+    document.querySelectorAll('#balanceVal').forEach(el => {
+        el.innerText = sintGetBalance().toLocaleString();
+    });
+}
+
+// Синхронизация баланса между открытыми вкладками/играми в реальном времени
+window.addEventListener('storage', (e) => {
+    if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
+});
+
+// --- Общий звук (простой бипер на Web Audio API) ---
+let sintAudioCtx = null;
+function sintPlaySound(freq, duration = 0.1) {
+    try {
+        if (!sintAudioCtx) sintAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (sintAudioCtx.state === 'suspended') sintAudioCtx.resume();
+        let osc = sintAudioCtx.createOscillator();
+        let gain = sintAudioCtx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.04, sintAudioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, sintAudioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(sintAudioCtx.destination);
+        osc.start();
+        osc.stop(sintAudioCtx.currentTime + duration);
+    } catch (e) {}
+}
+
+
+// =========================================================
+// 📊 ОБЩАЯ СТАТИСТИКА ДЛЯ ВСЕХ ИГР (localStorage)
+// =========================================================
+
+const SINT_STATS_KEY = 'sint_casino_stats';
+
+function sintGetStats() {
+    const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
+    const raw = localStorage.getItem(SINT_STATS_KEY);
+    if (!raw) return defaults;
+    try {
+        return Object.assign({}, defaults, JSON.parse(raw));
+    } catch (e) {
+        return defaults;
+    }
+}
+
+function sintRecordRound(game, wagered, won) {
+    const stats = sintGetStats();
+    stats.spins += 1;
+    stats.wagered += wagered;
+    stats.won += won;
+    if (won > stats.biggestWin) stats.biggestWin = won;
+    if (stats[game] !== undefined) stats[game] += 1;
+    localStorage.setItem(SINT_STATS_KEY, JSON.stringify(stats));
+}
+
+document.addEventListener('DOMContentLoaded', sintRenderBalance);
+    </script>
+    <script>
+        // =========================================================
+        // ⚙️ ЛОГИКА JETX (crash-игра)
+        // =========================================================
+
+        let roundActive = false;   // раунд летит
+        let betPlaced = false;     // игрок сделал ставку в этом раунде
+        let cashedOut = false;
+        let currentBet = 0;
+        let currentMultiplier = 1.00;
+        let crashPoint = 1.00;
+        let startTime = 0;
+        let rafId = null;
+        let history = [];
+
+        function setBet(amount) {
+            const input = document.getElementById('betAmount');
+            input.value = (parseInt(input.value) || 0) + amount;
+        }
+
+        function setBetMax() {
+            document.getElementById('betAmount').value = sintGetBalance();
+        }
+
+        // Генерация точки краша (упрощённая модель crash-игр, house edge ~3%)
+        function generateCrashPoint() {
+            const r = Math.random();
+            if (r < 0.03) return 1.00; // моментальный краш ~3% раундов
+            const point = 0.97 / (1 - r);
+            return Math.min(Math.round(point * 100) / 100, 200); // потолок x200
+        }
+
+        function placeBet() {
+            if (roundActive) return;
+
+            const bet = parseInt(document.getElementById('betAmount').value);
+            const status = document.getElementById('flightStatus');
+
+            if (isNaN(bet) || bet < 10) {
+                status.innerText = '❌ Минимальная ставка — 10 ₽';
+                return;
+            }
+            if (bet > sintGetBalance()) {
+                status.innerText = '❌ Недостаточно средств на балансе!';
+                return;
+            }
+
+            sintAddBalance(-bet);
+            currentBet = bet;
+            betPlaced = true;
+            cashedOut = false;
+
+            document.getElementById('betBtn').disabled = true;
+            document.getElementById('cashoutBtn').disabled = false;
+            status.style.color = '#ccc';
+            status.innerText = 'Раунд стартует...';
+
+            setTimeout(startRound, 700);
+        }
+
+        function startRound() {
+            roundActive = true;
+            crashPoint = generateCrashPoint();
+            currentMultiplier = 1.00;
+            startTime = performance.now();
+
+            const display = document.getElementById('multiplierDisplay');
+            display.classList.remove('crashed');
+            document.getElementById('flightStatus').innerText = 'Летим! 🚀';
+            document.getElementById('rocket').style.left = '10px';
+            document.getElementById('rocket').style.bottom = '10px';
+
+            tick();
+        }
+
+        function tick() {
+            const elapsed = (performance.now() - startTime) / 1000;
+            currentMultiplier = Math.min(Math.exp(elapsed * 0.17), crashPoint);
+
+            document.getElementById('multiplierDisplay').innerText = currentMultiplier.toFixed(2) + 'x';
+
+            const progress = Math.min(elapsed / 8, 1);
+            document.getElementById('flightTrail').style.width = (progress * 100) + '%';
+            document.getElementById('flightTrail').style.height = (progress * 100) + '%';
+            document.getElementById('rocket').style.left = (10 + progress * 220) + 'px';
+            document.getElementById('rocket').style.bottom = (10 + progress * 160) + 'px';
+
+            if (currentMultiplier >= crashPoint) {
+                crash();
+                return;
+            }
+
+            rafId = requestAnimationFrame(tick);
+        }
+
+        function crash() {
+            roundActive = false;
+            cancelAnimationFrame(rafId);
+
+            const display = document.getElementById('multiplierDisplay');
+            display.innerText = '💥 ' + crashPoint.toFixed(2) + 'x';
+            display.classList.add('crashed');
+
+            const status = document.getElementById('flightStatus');
+            if (!cashedOut && betPlaced) {
+                sintRecordRound('jetx', currentBet, 0);
+                status.style.color = '#ff3366';
+                status.innerText = `Крах на ${crashPoint.toFixed(2)}x! Ставка ${currentBet.toLocaleString()} ₽ сгорела.`;
+            } else if (!betPlaced) {
+                status.style.color = '#aaa';
+                status.innerText = `Крах на ${crashPoint.toFixed(2)}x.`;
+            }
+
+            pushHistory(crashPoint);
+            resetControls();
+        }
+
+        function cashOut() {
+            if (!roundActive || !betPlaced || cashedOut) return;
+
+            cashedOut = true;
+            const win = Math.round(currentBet * currentMultiplier);
+            sintAddBalance(win);
+            sintRecordRound('jetx', currentBet, win);
+
+            const status = document.getElementById('flightStatus');
+            status.style.color = '#00ff66';
+            status.innerText = `Забрано на ${currentMultiplier.toFixed(2)}x! Выигрыш ${win.toLocaleString()} ₽`;
+
+            document.getElementById('cashoutBtn').disabled = true;
+            sintPlaySound(600, 0.15);
+        }
+
+        function resetControls() {
+            betPlaced = false;
+            setTimeout(() => {
+                document.getElementById('betBtn').disabled = false;
+                document.getElementById('cashoutBtn').disabled = true;
+                if (!cashedOut) {
+                    // статус уже установлен в crash(), ничего не перезаписываем
+                }
+            }, 1200);
+        }
+
+        function pushHistory(point) {
+            history.unshift(point);
+            history = history.slice(0, 10);
+            const row = document.getElementById('historyRow');
+            row.innerHTML = history.map(p => {
+                const cls = p >= 2 ? 'high' : 'low';
+                return `<span class="history-chip ${cls}">${p.toFixed(2)}x</span>`;
+            }).join('');
+        }
+
+        // --- Пополнение (карта не проверяется по-настоящему, это демо) ---
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.add('active');
+            document.getElementById('depositError').innerText = '';
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.remove('active');
+        }
+
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            val = val.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = val.substring(0, 19);
+        });
+
+        document.getElementById('cardExp').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
+            e.target.value = val.substring(0, 5);
+        });
+
+        function processDeposit() {
+            const cardNum = document.getElementById('cardNumber').value.replace(/\s+/g, '');
+            const cardExp = document.getElementById('cardExp').value;
+            const cardCvc = document.getElementById('cardCvc').value;
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            const errorEl = document.getElementById('depositError');
+
+            if (!/^\d{16}$/.test(cardNum)) {
+                errorEl.innerText = '❌ Неверный номер карты! Должно быть 16 цифр.';
+                return;
+            }
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
+                errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 05/28).';
+                return;
+            }
+            if (!/^\d{3}$/.test(cardCvc)) {
+                errorEl.innerText = '❌ Неверный CVC код! Должно быть 3 цифры.';
+                return;
+            }
+            if (isNaN(amount) || amount < 100 || amount > 10000) {
+                errorEl.innerText = '❌ Сумма пополнения должна быть от 100 до 10 000 ₽!';
+                return;
+            }
+
+            sintAddBalance(amount);
+            closeDepositModal();
+            alert(`Успешно! Баланс пополнен на ${amount.toLocaleString()} ₽`);
+
+            document.getElementById('cardNumber').value = '';
+            document.getElementById('cardExp').value = '';
+            document.getElementById('cardCvc').value = '';
+            document.getElementById('depositAmount').value = '';
+        }
+
+        // --- Вывод средств (механика намеренно не изменена) ---
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('active');
+            document.getElementById('withdrawError').innerText = '';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.remove('active');
+        }
+
+        document.getElementById('withdrawCardNumber').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            val = val.replace(/(.{4})/g, '$1 ').trim();
+            e.target.value = val.substring(0, 19);
+        });
+
+        document.getElementById('withdrawCardExp').addEventListener('input', function(e) {
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length >= 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
+            e.target.value = val.substring(0, 5);
+        });
+
+        function processWithdraw() {
+            const cardNum = document.getElementById('withdrawCardNumber').value.replace(/\s+/g, '');
+            const cardExp = document.getElementById('withdrawCardExp').value;
+            const cardCvc = document.getElementById('withdrawCardCvc').value;
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const errorEl = document.getElementById('withdrawError');
+
+            if (!/^\d{16}$/.test(cardNum)) {
+                errorEl.innerText = '❌ Неверный номер карты! Номер должен состоять из 16 цифр.';
+                return;
+            }
+            if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardExp)) {
+                errorEl.innerText = '❌ Неверный срок действия! Формат: ММ/ГГ (например, 08/27).';
+                return;
+            }
+            if (!/^\d{3}$/.test(cardCvc)) {
+                errorEl.innerText = '❌ Неверный CVC/CVV код! Введите 3 цифры с оборота карты.';
+                return;
+            }
+            if (isNaN(amount) || amount < 100 || amount > 10000) {
+                errorEl.innerText = '❌ Недопустимая сумма! Вывод возможен от 100 до 10 000 ₽.';
+                return;
+            }
+            if (amount > sintGetBalance()) {
+                errorEl.innerText = '❌ Недостаточно средств на балансе для вывода этой суммы!';
+                return;
+            }
+
+            errorEl.innerText = '❌ Ошибка #2763: Транзакция отклонена шлюзом! Для активации вывода необходимо совершить повторное пополнение аккаунта на такую же сумму.';
+        }
+    </script>
+</body>
+</html>
