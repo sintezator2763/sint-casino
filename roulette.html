@@ -32,6 +32,23 @@
             position: relative;
         }
 
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #1f0036;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .btn-back:hover { transform: scale(1.05); }
+
         h1 {
             font-size: 2rem;
             color: #ffcc00;
@@ -62,10 +79,7 @@
             gap: 10px;
         }
 
-        .balance-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .balance-actions { display: flex; gap: 8px; }
 
         .balance-bar span.btn-action {
             padding: 4px 10px;
@@ -76,21 +90,10 @@
             transition: transform 0.1s;
         }
 
-        .balance-bar span.btn-action:hover {
-            transform: scale(1.05);
-        }
+        .balance-bar span.btn-action:hover { transform: scale(1.05); }
+        .balance-bar span.plus { background: #00ff66; color: #000; }
+        .balance-bar span.minus { background: #ff3366; color: #fff; }
 
-        .balance-bar span.plus {
-            background: #00ff66;
-            color: #000;
-        }
-
-        .balance-bar span.minus {
-            background: #ff3366;
-            color: #fff;
-        }
-
-        /* Колесо-дисплей */
         .wheel-display {
             background: #000;
             border: 4px solid #ffcc00;
@@ -135,7 +138,6 @@
             min-height: 20px;
         }
 
-        /* Ставки */
         .bet-amount-row {
             display: flex;
             gap: 8px;
@@ -144,10 +146,7 @@
             margin: 15px 0 10px;
         }
 
-        .bet-amount-row label {
-            font-size: 0.85rem;
-            color: #ccc;
-        }
+        .bet-amount-row label { font-size: 0.85rem; color: #ccc; }
 
         .bet-amount-row input {
             width: 120px;
@@ -250,15 +249,8 @@
             text-transform: uppercase;
         }
 
-        .btn-spin:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #b34700;
-        }
-
-        .btn-spin:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
+        .btn-spin:active { transform: translateY(3px); box-shadow: 0 2px 0 #b34700; }
+        .btn-spin:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .modal {
             display: none;
@@ -348,6 +340,7 @@
 <body>
 
     <div class="casino-card">
+        <a href="index.html" class="btn-back">⬅ НА ГЛАВНУЮ</a>
         <h1>🎡 SINT-CASINO.COM 🎡</h1>
         <div class="subtitle">РУЛЕТКА</div>
 
@@ -456,98 +449,105 @@
     </div>
 
     <script>
-// =========================================================
-// 💾 ОБЩИЙ БАЛАНС ДЛЯ ВСЕХ ИГР SINT-CASINO (localStorage)
-// =========================================================
+        const SINT_BALANCE_KEY = 'sint_casino_balance';
+        const SINT_DEFAULT_BALANCE = 0;
 
-const SINT_BALANCE_KEY = 'sint_casino_balance';
-const SINT_DEFAULT_BALANCE = 0;
+        function sintGetBalance() {
+            const raw = localStorage.getItem(SINT_BALANCE_KEY);
+            if (raw === null) {
+                localStorage.setItem(SINT_BALANCE_KEY, String(SINT_DEFAULT_BALANCE));
+                return SINT_DEFAULT_BALANCE;
+            }
+            const val = parseFloat(raw);
+            return isNaN(val) ? 0 : val;
+        }
 
-function sintGetBalance() {
-    const raw = localStorage.getItem(SINT_BALANCE_KEY);
-    if (raw === null) {
-        localStorage.setItem(SINT_BALANCE_KEY, String(SINT_DEFAULT_BALANCE));
-        return SINT_DEFAULT_BALANCE;
-    }
-    const val = parseFloat(raw);
-    return isNaN(val) ? 0 : val;
-}
+        function sintSetBalance(newVal) {
+            const rounded = Math.max(0, Math.round(newVal));
+            localStorage.setItem(SINT_BALANCE_KEY, String(rounded));
+            sintRenderBalance();
+            return rounded;
+        }
 
-function sintSetBalance(newVal) {
-    const rounded = Math.max(0, Math.round(newVal));
-    localStorage.setItem(SINT_BALANCE_KEY, String(rounded));
-    sintRenderBalance();
-    return rounded;
-}
+        function sintAddBalance(delta) {
+            return sintSetBalance(sintGetBalance() + delta);
+        }
 
-function sintAddBalance(delta) {
-    return sintSetBalance(sintGetBalance() + delta);
-}
+        function sintRenderBalance() {
+            const isEgg = sessionStorage.getItem('sint_egg_active') === 'true';
+            const eggSuffix = isEgg ? ', 🥚' : '';
+            const balContainer = document.querySelector('.balance-bar > div:first-child');
+            if (balContainer) {
+                balContainer.innerHTML = `💰 БАЛАНС: <span id="balanceVal">${sintGetBalance().toLocaleString()}</span> ₽${eggSuffix}`;
+            }
+        }
 
-function sintRenderBalance() {
-    document.querySelectorAll('#balanceVal').forEach(el => {
-        el.innerText = sintGetBalance().toLocaleString();
-    });
-}
+        function sintPlayEggMusic() {
+            if (sessionStorage.getItem('sint_egg_active') === 'true') {
+                if (!window.sintEggAudio) {
+                    window.sintEggAudio = new Audio('egg.mp3');
+                    window.sintEggAudio.loop = true;
+                }
+                window.sintEggAudio.play().catch(() => {
+                    const playOnClick = () => {
+                        if (window.sintEggAudio) window.sintEggAudio.play();
+                        document.removeEventListener('click', playOnClick);
+                    };
+                    document.addEventListener('click', playOnClick);
+                });
+            }
+        }
 
-// Синхронизация баланса между открытыми вкладками/играми в реальном времени
-window.addEventListener('storage', (e) => {
-    if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
-});
+        window.addEventListener('storage', (e) => {
+            if (e.key === SINT_BALANCE_KEY) sintRenderBalance();
+        });
 
-// --- Общий звук (простой бипер на Web Audio API) ---
-let sintAudioCtx = null;
-function sintPlaySound(freq, duration = 0.1) {
-    try {
-        if (!sintAudioCtx) sintAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (sintAudioCtx.state === 'suspended') sintAudioCtx.resume();
-        let osc = sintAudioCtx.createOscillator();
-        let gain = sintAudioCtx.createGain();
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.04, sintAudioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, sintAudioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(sintAudioCtx.destination);
-        osc.start();
-        osc.stop(sintAudioCtx.currentTime + duration);
-    } catch (e) {}
-}
+        let sintAudioCtx = null;
+        function sintPlaySound(freq, duration = 0.1) {
+            try {
+                if (!sintAudioCtx) sintAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (sintAudioCtx.state === 'suspended') sintAudioCtx.resume();
+                let osc = sintAudioCtx.createOscillator();
+                let gain = sintAudioCtx.createGain();
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.04, sintAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, sintAudioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(sintAudioCtx.destination);
+                osc.start();
+                osc.stop(sintAudioCtx.currentTime + duration);
+            } catch (e) {}
+        }
 
+        const SINT_STATS_KEY = 'sint_casino_stats';
 
-// =========================================================
-// 📊 ОБЩАЯ СТАТИСТИКА ДЛЯ ВСЕХ ИГР (localStorage)
-// =========================================================
+        function sintGetStats() {
+            const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
+            const raw = localStorage.getItem(SINT_STATS_KEY);
+            if (!raw) return defaults;
+            try {
+                return Object.assign({}, defaults, JSON.parse(raw));
+            } catch (e) {
+                return defaults;
+            }
+        }
 
-const SINT_STATS_KEY = 'sint_casino_stats';
+        function sintRecordRound(game, wagered, won) {
+            const stats = sintGetStats();
+            stats.spins += 1;
+            stats.wagered += wagered;
+            stats.won += won;
+            if (won > stats.biggestWin) stats.biggestWin = won;
+            if (stats[game] !== undefined) stats[game] += 1;
+            localStorage.setItem(SINT_STATS_KEY, JSON.stringify(stats));
+        }
 
-function sintGetStats() {
-    const defaults = { spins: 0, wagered: 0, won: 0, biggestWin: 0, slots: 0, roulette: 0, jetx: 0 };
-    const raw = localStorage.getItem(SINT_STATS_KEY);
-    if (!raw) return defaults;
-    try {
-        return Object.assign({}, defaults, JSON.parse(raw));
-    } catch (e) {
-        return defaults;
-    }
-}
-
-function sintRecordRound(game, wagered, won) {
-    const stats = sintGetStats();
-    stats.spins += 1;
-    stats.wagered += wagered;
-    stats.won += won;
-    if (won > stats.biggestWin) stats.biggestWin = won;
-    if (stats[game] !== undefined) stats[game] += 1;
-    localStorage.setItem(SINT_STATS_KEY, JSON.stringify(stats));
-}
-
-document.addEventListener('DOMContentLoaded', sintRenderBalance);
+        document.addEventListener('DOMContentLoaded', () => {
+            sintRenderBalance();
+            sintPlayEggMusic();
+        });
     </script>
     <script>
-        // =========================================================
-        // ⚙️ НАСТРОЙКИ РУЛЕТКИ
-        // =========================================================
-
         const RED_NUMBERS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
         let selectedType = 'red';
 
@@ -597,7 +597,6 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
                 }
             }
 
-            // Списываем ставку сразу
             sintAddBalance(-bet);
             btn.disabled = true;
             label.style.color = '#aaa';
@@ -666,7 +665,6 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
             document.getElementById('winModal').classList.remove('active');
         }
 
-        // --- Пополнение (карта не проверяется по-настоящему, это демо) ---
         function openDepositModal() {
             document.getElementById('depositModal').classList.add('active');
             document.getElementById('depositError').innerText = '';
@@ -722,7 +720,6 @@ document.addEventListener('DOMContentLoaded', sintRenderBalance);
             document.getElementById('depositAmount').value = '';
         }
 
-        // --- Вывод средств (механика намеренно не изменена) ---
         function openWithdrawModal() {
             document.getElementById('withdrawModal').classList.add('active');
             document.getElementById('withdrawError').innerText = '';
