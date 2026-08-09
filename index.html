@@ -32,6 +32,23 @@
             position: relative;
         }
 
+        .btn-settings {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #1f0036;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .btn-settings:hover { transform: scale(1.05); }
+
         h1 {
             font-size: 2rem;
             color: #ffcc00;
@@ -250,11 +267,23 @@
 
         .modal-btn.withdraw-btn { background: #ff3366; color: #fff; }
         .close-btn { background: #444; color: #fff; margin-top: 5px; }
+
+        .egg-gif {
+            width: 90px;
+            height: auto;
+            display: block;
+            margin: 12px auto;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .egg-gif:hover { transform: scale(1.1); }
     </style>
 </head>
 <body>
 
     <div class="casino-card">
+        <button class="btn-settings" onclick="openSettingsModal()">⚙️ НАСТРОЙКИ</button>
         <h1>🎲 SINT-CASINO.COM 🎲</h1>
         <div class="subtitle">ГЛАВНАЯ СТРАНИЦА</div>
 
@@ -314,6 +343,22 @@
                     <p>Успей забрать выигрыш до краша</p>
                 </div>
             </a>
+        </div>
+
+        <!-- Модальное окно настроек -->
+        <div class="modal" id="settingsModal">
+            <div class="modal-content" style="border-color: #ff007f; text-align: center;">
+                <h3 style="color: #ff007f;">⚙️ НАСТРОЙКИ</h3>
+                <p style="font-size: 0.8rem; color: #aaa; margin-top: 4px;">Управление аккаунтом</p>
+                
+                <img src="https://media.tenor.com/Sj6JT-GpHE0AAAAj/the-man-behind-the-tree-deltarune.gif" 
+                     class="egg-gif" 
+                     onclick="activateEgg()" 
+                     alt="Easter Egg">
+
+                <button class="modal-btn withdraw-btn" style="margin-top: 10px;" onclick="deleteAccount()">🗑️ УДАЛИТЬ АККАУНТ</button>
+                <button class="modal-btn close-btn" onclick="closeSettingsModal()">ЗАКРЫТЬ</button>
+            </div>
         </div>
 
         <div class="modal" id="depositModal">
@@ -397,9 +442,34 @@
         }
 
         function sintRenderBalance() {
-            document.querySelectorAll('#balanceVal').forEach(el => {
-                el.innerText = sintGetBalance().toLocaleString();
-            });
+            const isEgg = sessionStorage.getItem('sint_egg_active') === 'true';
+            const eggSuffix = isEgg ? ', 🥚' : '';
+            const balContainer = document.querySelector('.balance-bar > div:first-child');
+            if (balContainer) {
+                balContainer.innerHTML = `💰 БАЛАНС: <span id="balanceVal">${sintGetBalance().toLocaleString()}</span> ₽${eggSuffix}`;
+            }
+        }
+
+        function sintPlayEggMusic() {
+            if (sessionStorage.getItem('sint_egg_active') === 'true') {
+                if (!window.sintEggAudio) {
+                    window.sintEggAudio = new Audio('egg.mp3');
+                    window.sintEggAudio.loop = true;
+                }
+                window.sintEggAudio.play().catch(() => {
+                    const playOnClick = () => {
+                        if (window.sintEggAudio) window.sintEggAudio.play();
+                        document.removeEventListener('click', playOnClick);
+                    };
+                    document.addEventListener('click', playOnClick);
+                });
+            }
+        }
+
+        function activateEgg() {
+            sessionStorage.setItem('sint_egg_active', 'true');
+            sintPlayEggMusic();
+            sintRenderBalance();
         }
 
         window.addEventListener('storage', (e) => {
@@ -438,6 +508,30 @@
                 <span class="breakdown-chip">🎡 Рулетка: ${s.roulette}</span>
                 <span class="breakdown-chip">🚀 JetX: ${s.jetx}</span>
             `;
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function deleteAccount() {
+            if (confirm('Вы уверены, что хотите удалить аккаунт? Вся статистика, баланс и весь прогресс будут безвозвратно уничтожены!')) {
+                localStorage.removeItem(SINT_BALANCE_KEY);
+                localStorage.removeItem(SINT_STATS_KEY);
+                sessionStorage.removeItem('sint_egg_active');
+                if (window.sintEggAudio) {
+                    window.sintEggAudio.pause();
+                    window.sintEggAudio = null;
+                }
+                sintRenderBalance();
+                renderStats();
+                closeSettingsModal();
+                alert('Аккаунт успешно уничтожен!');
+            }
         }
 
         function openDepositModal() {
@@ -550,6 +644,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             sintRenderBalance();
             renderStats();
+            sintPlayEggMusic();
         });
     </script>
 </body>
