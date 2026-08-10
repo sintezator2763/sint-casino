@@ -95,6 +95,41 @@
         .balance-bar span.plus { background: #00ff66; color: #000; }
         .balance-bar span.minus { background: #ff3366; color: #fff; }
 
+        .promo-box {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .promo-box input {
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #ff007f;
+            background: #000;
+            color: #fff;
+            text-align: center;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            width: 60%;
+        }
+
+        .promo-box button {
+            background: #ff007f;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .promo-msg {
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            min-height: 18px;
+        }
+
         .flight-box {
             background: linear-gradient(180deg, #0a0018 0%, #1a002c 100%);
             border: 4px solid #ffcc00;
@@ -332,6 +367,12 @@
             </div>
         </div>
 
+        <div class="promo-box">
+            <input type="text" id="promoInput" placeholder="ПРОМОКОД">
+            <button onclick="activatePromo()">ОК</button>
+        </div>
+        <div id="promoMsg" class="promo-msg"></div>
+
         <div class="flight-box">
             <div class="flight-status" id="flightStatus">Сделайте ставку до старта раунда</div>
             <div class="flight-trail" id="flightTrail"></div>
@@ -417,6 +458,54 @@
     <script>
         const SINT_BALANCE_KEY = 'sint_casino_balance';
         const SINT_DEFAULT_BALANCE = 0;
+        const SINT_PROMO_KEY = 'sint_casino_used_promos';
+
+        const PROMO_CODES = {
+            'RAKETA': 5000,
+            'FAMILY': 75000
+        };
+
+        function sintGetUsedPromos() {
+            const raw = localStorage.getItem(SINT_PROMO_KEY);
+            if (!raw) return [];
+            try { return JSON.parse(raw); } catch (e) { return []; }
+        }
+
+        function sintMarkPromoUsed(code) {
+            const used = sintGetUsedPromos();
+            if (!used.includes(code)) {
+                used.push(code);
+                localStorage.setItem(SINT_PROMO_KEY, JSON.stringify(used));
+            }
+        }
+
+        function activatePromo() {
+            const input = document.getElementById('promoInput');
+            const msg = document.getElementById('promoMsg');
+            if (!input || !msg) return;
+
+            const code = input.value.trim().toUpperCase();
+            if (!code) return;
+
+            const used = sintGetUsedPromos();
+            if (used.includes(code)) {
+                msg.style.color = '#ff3366';
+                msg.innerText = '❌ Этот промокод уже был активирован!';
+                return;
+            }
+
+            if (PROMO_CODES.hasOwnProperty(code)) {
+                const reward = PROMO_CODES[code];
+                sintAddBalance(reward);
+                sintMarkPromoUsed(code);
+                msg.style.color = '#00ff66';
+                msg.innerText = `✅ Промокод ${code} активирован! +${reward.toLocaleString()} ₽`;
+                input.value = '';
+            } else {
+                msg.style.color = '#ff3366';
+                msg.innerText = '❌ Неверный промокод!';
+            }
+        }
 
         function sintGetBalance() {
             const raw = localStorage.getItem(SINT_BALANCE_KEY);
