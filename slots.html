@@ -378,6 +378,7 @@
     <script>
         const SINT_BALANCE_KEY = 'sint_casino_balance';
         const SINT_DEFAULT_BALANCE = 0;
+        const SINT_PROMO_KEY = 'sint_casino_used_promos';
 
         function sintGetBalance() {
             const raw = localStorage.getItem(SINT_BALANCE_KEY);
@@ -501,18 +502,32 @@
         const SPIN_COST = 100;
         const SYMBOL_HEIGHT = 105;
 
-        let usedPromos = new Set();
+        function sintGetUsedPromos() {
+            const raw = localStorage.getItem(SINT_PROMO_KEY);
+            if (!raw) return [];
+            try { return JSON.parse(raw); } catch (e) { return []; }
+        }
+
+        function sintMarkPromoUsed(code) {
+            const used = sintGetUsedPromos();
+            if (!used.includes(code)) {
+                used.push(code);
+                localStorage.setItem(SINT_PROMO_KEY, JSON.stringify(used));
+            }
+        }
 
         document.getElementById('spinCostVal').innerText = SPIN_COST;
 
         function activatePromo() {
             const input = document.getElementById('promoInput');
             const msg = document.getElementById('promoMsg');
-            const code = input.value.trim().toUpperCase();
+            if (!input || !msg) return;
 
+            const code = input.value.trim().toUpperCase();
             if (!code) return;
 
-            if (usedPromos.has(code)) {
+            const used = sintGetUsedPromos();
+            if (used.includes(code)) {
                 msg.style.color = '#ff3366';
                 msg.innerText = '❌ Этот промокод уже был активирован!';
                 return;
@@ -521,7 +536,7 @@
             if (PROMO_CODES.hasOwnProperty(code)) {
                 const reward = PROMO_CODES[code];
                 sintAddBalance(reward);
-                usedPromos.add(code);
+                sintMarkPromoUsed(code);
                 msg.style.color = '#00ff66';
                 msg.innerText = `✅ Промокод ${code} активирован! +${reward.toLocaleString()} ₽`;
                 input.value = '';
